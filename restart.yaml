@@ -1,0 +1,15 @@
+---
+- name: Restart SPADS
+  hosts: all
+#  remote_user: root
+
+  tasks:
+    - name: Restart SPADS services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - pr-downloader.service
+        - rclone-maps.service
+        - spads_config_updater.service
+        - spads.service

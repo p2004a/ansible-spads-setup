@@ -1,0 +1,32 @@
+---
+- name: Stop SPADS
+  hosts: all
+#  remote_user: root
+
+  tasks:
+    - name: Disable SPADS timers
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      with_items:
+        - pr-downloader.timer
+        - rclone-maps.timer
+        - spads_config_updater.timer
+
+    - name: Stop SPADS secondary services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+      with_items:
+        - pr-downloader.service
+        - rclone-maps.service
+        - spads_config_updater.service
+
+    - name: Stop and disable SPADS
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      with_items:
+        - spads.service

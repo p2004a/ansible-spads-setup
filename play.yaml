@@ -1,0 +1,10 @@
+---
+- name: Configure/update SPADS
+  hosts: all
+#  remote_user: root
+  become: yes
+
+  tasks:
+  - name: Include the SPADS role
+    ansible.builtin.include_role:
+      name: spads

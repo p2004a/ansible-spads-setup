@@ -1,0 +1,91 @@
+
+spads_username: "{{ vault_spads_username }}"
+spads_user_password: "{{ vault_spads_user_password }}"
+# if running SPADS as root then user_homedir needs to be /root
+user_homedir: /home/{{ spads_username }}
+spads_install_path: "{{ user_homedir }}/spads"
+
+# skips the tasks in the delete.yaml playbook if false as a safety mechanism
+allow_delete: false
+
+sftp_login: "{{ vault_sftp_login }}"
+sftp_password: "{{ vault_sftp_password }}"
+
+engine_github_path: https://github.com/beyond-all-reason/spring/releases/download/spring_bar_%7BBAR105%7D105.1.1-1821-gaca6f20/spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable.7z
+engine_dir: spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable
+
+# skips the rclone sync during the play.yaml playbook as it takes a long time
+# note: rclone still syncs when ansible starts the service
+skip_rclone_sync: true
+
+package_dependencies:
+  - sudo
+  - wget
+  - curl
+  - htop
+  - byobu
+  - mc
+  - p7zip
+  - g++
+  - swig
+  - locate
+  - git
+  - python3-dev
+  - cpanminus
+  - p7zip-full
+  - python3-distutils
+  - make
+  - sshpass
+  - perl-doc
+  - acl
+  - ufw
+  - libffi-platypus-perl
+  - libdbd-sqlite3-perl
+
+# swap size in megabytes
+swap_size: 4096
+swap_file: /var/swap.img
+swap_swappiness: '10'
+
+# the following are for spads_cluster_launcher.sh
+spads_lobbyLogin: '[teh]cluster1'
+spads_channel:
+spads_lobbyPassword: "{{ vault_spads_lobbyPassword }}"
+spads_registrationEmail: "{{ vault_spads_registrationEmail }}"
+spads_lobbyHost: server4.beyondallreason.info
+spads_baseGamePort: 53200
+spads_baseAutoHostPort: 53100
+spads_hostRegion: '"UNKNOWN - "'  # To be better defined in per group vars
+spads_enginesBaseDir: "{{ spads_install_path }}/var/spring/"
+spads_engineDir: "{{ engine_dir }}/"
+spads_springDataDir: "{{ spads_install_path }}/var/spring/data"
+spads_endGameCommandPath: "{{ spads_install_path }}/upload_replay.sh"
+spads_localLanIp: 192.168.1.102
+spads_maxInstances: 99
+spads_targetSpares: 1
+spads_clusters:
+spads_hostIp:
+spads_autoLoadPlugins: '"AutoRegister;ClusterManager;JsonStatus;InGameMute;DynamicMapRotation;BarManager;RatingManager"'
+
+# the following are for spadsInstaller.auto
+autoinstaller_release: unstable
+autoinstaller_etcDir: etc
+autoinstaller_varDir: var
+autoinstaller_logDir: log
+autoinstaller_springBinariesType: custom
+autoinstaller_unitsyncPath: "{{ spads_install_path }}/var/spring/{{ engine_dir }}/libunitsync.so"
+autoinstaller_baseDataDir: "{{ spads_install_path }}/var/spring/{{ engine_dir }}"
+autoinstaller_mapModDataDir: "{{ spads_install_path }}/var/spring/"
+autoinstaller_springServerType: dedicated
+autoinstaller_springServer: "{{ spads_install_path }}/var/spring/{{ engine_dir }}/spring-dedicated"
+autoinstaller_modName: "_NO_GAME_FOUND_"
+autoinstaller_lobbyLogin: "[teh]cluster"
+autoinstaller_lobbyPassword: changeme
+autoinstaller_owner: changeme
+
+# rclone config options
+# this is applied only once, rclone takes over once the file is initially written
+rclone_type: drive
+rclone_scope: drive.readonly
+rclone_token: "{{ vault_rclone_token }}"
+rclone_team_drive: ""

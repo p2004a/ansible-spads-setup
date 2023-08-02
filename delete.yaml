@@ -1,0 +1,34 @@
+---
+- name: Delete SPADS
+  hosts: all
+#  remote_user: root
+
+  tasks:
+    - name: Stop SPADS services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      ignore_errors: true
+      when: allow_delete is true
+      with_items:
+        - pr-downloader.service
+        - pr-downloader.timer
+        - rclone-maps.service
+        - rclone-maps.timer
+        - spads_config_updater.service
+        - spads_config_updater.timer
+
+    - name: Delete SPADS files and services
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      when: allow_delete is true
+      with_items:
+        - "{{ spads_install_path }}"
+        - /etc/systemd/system/pr-downloader.service
+        - /etc/systemd/system/pr-downloader.timer
+        - /etc/systemd/system/rclone-maps.service
+        - /etc/systemd/system/rclone-maps.timer
+        - /etc/systemd/system/spads_config_updater.service
+        - /etc/systemd/system/spads_config_updater.timer

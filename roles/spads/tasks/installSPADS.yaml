@@ -1,0 +1,104 @@
+- name: Create {{ spads_install_path }}/var/spring
+  ansible.builtin.file:
+    path: "{{ spads_install_path }}/var/spring"
+    state: directory
+
+- name: Create {{ spads_install_path }}/var/plugins
+  ansible.builtin.file:
+    path: "{{ spads_install_path }}/var/plugins"
+    state: directory
+
+- name: Create {{ spads_install_path }}/etc
+  ansible.builtin.file:
+    path: "{{ spads_install_path }}/etc"
+    state: directory
+
+- name: Checkout SPADS
+  ansible.builtin.git:
+    repo: 'https://github.com/beyond-all-reason/spads_config_bar.git'
+    dest: "{{ spads_install_path }}/spads_config_bar"
+
+- name: Run spads_config_bar_updater.py -s
+  ansible.builtin.command:
+    cmd: python3 {{ spads_install_path }}/spads_config_bar/spads_config_bar_updater.py -s
+  register: out
+  changed_when: "'Already up to date.' not in out.stdout"
+
+- debug: var=out.stdout_lines
+
+- name: Run spads_config_bar_updater.py -u
+  ansible.builtin.command:
+    cmd: "python3 {{ spads_install_path }}/spads_config_bar/spads_config_bar_updater.py -u {{ engine_github_path }}"
+    creates: "{{ spads_install_path }}/var/spring/{{ engine_dir }}"
+  register: out
+
+- debug: var=out.stdout_lines
+
+- name: Check if SPADS is installed
+  stat:
+    path: "{{ spads_install_path }}/spadsInstaller.lastRun"
+  register: spadsinstalled
+
+- name: Download spadsInstaller.tar
+  ansible.builtin.get_url:
+    url: http://planetspads.free.fr/spads/installer/spadsInstaller.tar
+    dest: "{{ spads_install_path }}/spadsInstaller.tar"
+  when: not spadsinstalled.stat.exists
+
+- name: Extract spadsInstaller.tar into {{ spads_install_path }}
+  ansible.builtin.unarchive:
+    src: "{{ spads_install_path }}/spadsInstaller.tar"
+    dest: "{{ spads_install_path }}"
+    remote_src: yes
+  when: not spadsinstalled.stat.exists
+
+- name: Copy SPADS autoinstaller template file to remote host
+  ansible.builtin.template:
+    src: "spadsInstaller.auto.j2"
+    dest: "{{ spads_install_path }}/spadsInstaller.auto"
+  when: not spadsinstalled.stat.exists
+
+- name: Install SPADS
+  ansible.builtin.command:
+    cmd: "./spadsInstaller.pl"
+    chdir: "{{ spads_install_path }}"
+    creates: "{{ spads_install_path }}/spadsInstaller.lastRun"
+  register: out
+
+- debug: var=out.stdout_lines
+
+- name: Copy SPADS cluster launcher template file to remote host
+  ansible.builtin.template:
+    src: "spads_cluster_launcher.sh.j2"
+    dest: "{{ spads_install_path }}/etc/spads_cluster_launcher.sh"
+
+- name: Change permissions of SPADS cluster launcher script
+  ansible.builtin.file:
+    path: "{{ spads_install_path }}/etc/spads_cluster_launcher.sh"
+    mode: 0775
+
+- name: Copy pr-downloader into {{ spads_install_path }}
+  ansible.builtin.copy:
+    src: "{{ spads_install_path }}/var/spring/{{ engine_dir }}/pr-downloader"
+    dest: "{{ spads_install_path }}"
+    remote_src: yes
+
+- name: Run pr-downloader
+  ansible.builtin.command:
+    cmd: "{{ spads_install_path }}/pr-downloader --filesystem-writepath {{ spads_install_path }}/var/spring/data byar:test"
+    creates: "{{ spads_install_path }}/var/spring/data"
+  register: out
+
+- debug: var=out.stdout_lines
+
+- name: Add SFTP_PASSWORD to .bashrc
+  ansible.builtin.lineinfile:
+    path: /home/{{ spads_username }}/.bashrc
+    regexp: '^export SFTP_PASSWORD='
+    line: export SFTP_PASSWORD={{ sftp_password }}
+
+- name: Add SFTP_LOGIN to .bashrc
+  ansible.builtin.lineinfile:
+    path: /home/{{ spads_username }}/.bashrc
+    regexp: '^export SFTP_LOGIN='
+    line: export SFTP_LOGIN={{ sftp_login }}

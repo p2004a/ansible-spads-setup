@@ -1,0 +1,17 @@
+[Unit]
+Description=pr-Downloader
+After=network.target
+
+StartLimitIntervalSec=600
+StartLimitBurst=3
+
+[Service]
+User={{ spads_username }}
+Type=oneshot
+Environment="PRD_RAPID_USE_STREAMER=false"
+Environment="PRD_RAPID_REPO_MASTER=https://bar-rapid.p2004a.com/repos.gz"
+ExecStart=perl {{ spads_install_path }}/sequentialSpadsUnitsyncProcess.pl {{ spads_install_path }}/var {{ spads_install_path }}/pr-downloader --filesystem-writepath {{ spads_install_path }}/var/spring/data byar:test
+StandardOutput=journal
+Restart=on-failure
+RestartSec=5s
+Nice=15

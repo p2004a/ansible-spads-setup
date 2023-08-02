@@ -1,0 +1,19 @@
+# also hosts bar repos
+eu3 ansible_host=135.125.232.13 ansible_user=debian
+# engine test host
+eu4 ansible_host=176.57.150.243 ansible_user=debian
+
+# add each server to the matching region below
+[au]
+
+[eu]
+eu3
+eu4
+
+[us]
+
+# the group containing each region
+[spads:children]
+au
+eu
+us

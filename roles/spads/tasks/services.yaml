@@ -1,0 +1,66 @@
+- name: Copy pr-downloader service template file to remote host
+  ansible.builtin.template:
+    src: "pr-downloader.service.j2"
+    dest: "/etc/systemd/system/pr-downloader.service"
+
+- name: Copy pr-downloader timer template file to remote host
+  ansible.builtin.template:
+    src: "pr-downloader.timer.j2"
+    dest: "/etc/systemd/system/pr-downloader.timer"
+
+- name: Copy rclone-maps service template file to remote host
+  ansible.builtin.template:
+    src: "rclone-maps.service.j2"
+    dest: "/etc/systemd/system/rclone-maps.service"
+
+- name: Copy rclone-maps timer template file to remote host
+  ansible.builtin.template:
+    src: "rclone-maps.timer.j2"
+    dest: "/etc/systemd/system/rclone-maps.timer"
+
+- name: Copy spads_config_updater service template file to remote host
+  ansible.builtin.template:
+    src: "spads_config_updater.service.j2"
+    dest: "/etc/systemd/system/spads_config_updater.service"
+
+- name: Copy spads_config_updater timer template file to remote host
+  ansible.builtin.template:
+    src: "spads_config_updater.timer.j2"
+    dest: "/etc/systemd/system/spads_config_updater.timer"
+
+- name: Copy SPADS service template file to remote host
+  ansible.builtin.template:
+    src: "spads.service.j2"
+    dest: "/etc/systemd/system/spads.service"
+
+- name: Force systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable SPADS timers
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items:
+    - pr-downloader.timer
+    - rclone-maps.timer
+    - spads_config_updater.timer
+
+- name: Start SPADS secondary services (this will trigger rclone to sync)
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+  with_items:
+    - pr-downloader.service
+    - rclone-maps.service
+    - spads_config_updater.service
+
+- name: Start and enable SPADS
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items:
+    - spads.service
+

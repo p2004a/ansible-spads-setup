@@ -1,0 +1,20 @@
+- name: Allow and rate limit SSH
+  community.general.ufw:
+    rule: limit
+    port: ssh
+    proto: tcp
+
+- name: Allow SPADS ports TCP/{{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}
+  community.general.ufw:
+    rule: allow
+    port: "{{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}"
+    proto: tcp
+
+- name: Ensure default deny for incoming traffic
+  community.general.ufw:
+    default: deny
+    direction: incoming
+
+- name: Enable firewall
+  community.general.ufw:
+    state: enabled

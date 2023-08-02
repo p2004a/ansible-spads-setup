@@ -1,0 +1,11 @@
+[Unit]
+Description=Spring Perl Autohost Dedicated Server
+After=network.target
+
+[Service]
+User={{ spads_username }}
+WorkingDirectory={{ spads_install_path }}/etc
+ExecStart={{ spads_install_path }}/etc/spads_cluster_launcher.sh
+
+[Install]
+WantedBy=multi-user.target

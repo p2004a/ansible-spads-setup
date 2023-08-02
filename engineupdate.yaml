@@ -1,0 +1,20 @@
+---
+- name: Update SPADS engine
+  hosts: all
+#  remote_user: root
+
+  tasks:
+    - name: Run spads_config_bar_updater.py -c -u
+      ansible.builtin.command:
+        cmd: "python3 {{ spads_install_path }}/spads_config_bar/spads_config_bar_updater.py -c -u {{ engine_github_path }}"
+        # creates: "{{ spads_install_path }}/var/spring/{{ engine_dir }}/springsettings.cfg"
+      register: out
+
+    - debug: var=out.stdout_lines
+
+    - name: Restart SPADS
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: restarted
+      with_items:
+        - spads.service
