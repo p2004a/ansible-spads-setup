@@ -14,15 +14,6 @@
         - rclone-maps.timer
         - spads_config_updater.timer
 
-    - name: Start SPADS secondary services
-      ansible.builtin.systemd:
-        name: "{{ item }}"
-        state: started
-      with_items:
-        - pr-downloader.service
-        - rclone-maps.service
-        - spads_config_updater.service
-
     - name: Start and enable SPADS
       ansible.builtin.systemd:
         name: "{{ item }}"
