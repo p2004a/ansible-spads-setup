@@ -18,6 +18,10 @@ engine_dir: spring_bar_.BAR105.105.1.1-1821-gaca6f20_linux-64-minimal-portable
 # note: rclone still syncs when ansible starts the service
 skip_rclone_sync: true
 
+# allows system monitoring, currently with checkmk
+monitoring_enabled: true
+monitoring_port: 6556 
+
 package_dependencies:
   - sudo
   - wget

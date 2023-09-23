@@ -10,6 +10,13 @@
     port: "{{ spads_baseGamePort }}:{{ spads_baseGamePort + (spads_maxInstances * 2) }}"
     proto: tcp
 
+- name: Allow system monitoring
+  community.general.ufw:
+    rule: limit
+    port: " {{ monitoring_port }}"
+    proto: tcp
+  when: monitoring_enabled is true
+
 - name: Ensure default deny for incoming traffic
   community.general.ufw:
     default: deny
