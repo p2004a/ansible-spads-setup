@@ -1,0 +1,11 @@
+---
+- name: Install map syncer dependencies
+  ansible.builtin.package:
+    name: python3-paho-mqtt
+    state: present
+
+- name: Install map_syncer script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/beyond-all-reason/maps-metadata/main/tools/map_syncer/map_syncer.py
+    dest: /usr/local/bin/map_syncer.py
+    mode: '0755'
