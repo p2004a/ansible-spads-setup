@@ -1,0 +1,2 @@
+ssh bar-mon python3 - < maintenance_windows_load.py > maintenance_windows_load.dzn
+minizinc --solver chuffed maintenance_windows.mzn maintenance_windows.dzn maintenance_windows_load.dzn

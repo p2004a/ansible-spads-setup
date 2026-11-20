@@ -1,0 +1,13 @@
+% REGION and load are in maintenance_windows_load.dzn, HOST, region and
+% capacity come from maintenance_windows_hosts.py.
+
+% Max instances in maintenance at once, per region and over all regions.
+max_down = [AU: 150, EA: 110, EU: 320, US: 230, NG: 40];
+max_down_total = 350;
+
+% UTC offsets of the regions' local time zones, with DST.
+utc_offsets = [AU: {10, 11}, EA: {8}, EU: 0..3, US: -8..-4, NG: 0..3];
+
+% Weight of hosts of a region being in maintenance together, vs. the players
+% affected. With 1, windows spread out when it's cheap.
+overlap_weight = 1;
